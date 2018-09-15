@@ -3,8 +3,11 @@ package com.example.autonoma.abcdwebservices;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.autonoma.abcdwebservices.adapter.MainAdapter;
 import com.example.autonoma.abcdwebservices.api.UsuarioAPI;
@@ -22,6 +25,7 @@ import retrofit2.Retrofit;
 public class MainActivity extends AppCompatActivity {
     //
     ListView lvListado;
+    Button btnAgregar;
     //
     Retrofit retrofit;
     UsuarioAPI usuarioAPI;
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lvListado = (ListView) findViewById(R.id.lvListado);
+        btnAgregar = (Button) findViewById(R.id.btnAgregar);
         //
         retrofit = new MainAdapter().getAdapter();
         usuarioAPI = retrofit.create(UsuarioAPI.class);
@@ -61,7 +66,31 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<Usuarios> call, Throwable t) {
                 Log.d("usuariosCall","onFailure");
             }
-        });
+        }); //fin enqueue
+        btnAgregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //
+                Call<Usuario> usuarioCall =
+                        usuarioAPI.postUsuario("Elvis","Rivera");
+                //
+                usuarioCall.enqueue(new Callback<Usuario>() {
+                    @Override
+                    public void onResponse(Call<Usuario> call, Response<Usuario> response) {
+                        Log.d("PostUserCall","onResponse");
+                        Toast.makeText(
+                                MainActivity.this,
+                                "ID registrado:"+response.body().getId(),
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
 
+                    @Override
+                    public void onFailure(Call<Usuario> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
     }
 }
