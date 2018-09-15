@@ -1,9 +1,11 @@
 package com.example.autonoma.abcdwebservices;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -13,6 +15,7 @@ import com.example.autonoma.abcdwebservices.adapter.MainAdapter;
 import com.example.autonoma.abcdwebservices.api.UsuarioAPI;
 import com.example.autonoma.abcdwebservices.model.Usuario;
 import com.example.autonoma.abcdwebservices.model.Usuarios;
+import com.example.autonoma.abcdwebservices.model.Usuarios2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +41,29 @@ public class MainActivity extends AppCompatActivity {
         //
         retrofit = new MainAdapter().getAdapter();
         usuarioAPI = retrofit.create(UsuarioAPI.class);
+        //
+        lvListado.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("onItemClick","click");
+
+                Call<Usuarios2> usuarioCall =
+                        usuarioAPI.getUsuario(2);
+
+                usuarioCall.enqueue(new Callback<Usuarios2>() {
+                    @Override
+                    public void onResponse(Call<Usuarios2> call, Response<Usuarios2> response) {
+                        Log.d("onItemClick2",response.body().getData().getFirst_name().toString());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Usuarios2> call, Throwable t) {
+                        Log.d("onItemClick2",t.getMessage());
+                    }
+                });
+
+            }
+        });
         //obtengo los datos
         Call<Usuarios> usuariosCall = usuarioAPI.getAllUsuarios();
         //escucha
@@ -70,26 +96,8 @@ public class MainActivity extends AppCompatActivity {
         btnAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //
-                Call<Usuario> usuarioCall =
-                        usuarioAPI.postUsuario("Elvis","Rivera");
-                //
-                usuarioCall.enqueue(new Callback<Usuario>() {
-                    @Override
-                    public void onResponse(Call<Usuario> call, Response<Usuario> response) {
-                        Log.d("PostUserCall","onResponse");
-                        Toast.makeText(
-                                MainActivity.this,
-                                "ID registrado:"+response.body().getId(),
-                                Toast.LENGTH_LONG
-                        ).show();
-                    }
-
-                    @Override
-                    public void onFailure(Call<Usuario> call, Throwable t) {
-
-                    }
-                });
+                Intent intent = new Intent(MainActivity.this,Main2Activity.class);
+                startActivity(intent);
             }
         });
     }
